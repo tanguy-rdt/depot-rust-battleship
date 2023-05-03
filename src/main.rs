@@ -6,7 +6,7 @@ struct Game{
     board: [[&'static str; 10]; 10],
 }
 
-fn setup(){
+fn setup() -> (game::User, game::User){
     cli_ui::show_battleship();
 
     let mut user1 = game::User {
@@ -44,9 +44,33 @@ fn setup(){
         }
         game::fill_user_solution((x, y), &mut user2)
     }
+
+    (user1, user2)
+}
+
+fn play(user1: &mut game::User, user2: &mut game::User, player: u8){
+    cli_ui::clear_screen();
+    cli_ui::show_battleship();
+    cli_ui::show_boards(user1.state, user2.state, player);
+    let (x, y) = cli_ui::ask_target();
+    if player == 0 {
+        game::fill_user_state((x, y), user2);
+    } else {
+        game::fill_user_state((x, y), user1);
+    }
 }
 
 
 fn main(){
-    setup();
+    let (mut user1, mut user2) = setup();
+    let mut player = 0;
+    while !game::end(&user1, &user2){
+        play(&mut user1, &mut user2, player);
+
+        if player == 0 {
+            player = 1;
+        } else {
+            player = 0;
+        }
+    }
 }

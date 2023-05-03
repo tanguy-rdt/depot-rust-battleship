@@ -76,3 +76,15 @@ pub fn ask_ship_position(ship: &str) -> ([i32; 2], [i32; 2]){
 
     ([x1, x2], [y1, y2])
 }
+
+pub fn ask_target() -> (i32, i32){
+    print!("Enter the position of the target: ");
+    _ = io::stdout().flush();
+    let mut pos = String::new();
+    _ = io::stdin().read_line(&mut pos);
+    pos = pos.trim().to_string();
+
+    let (x, y) = game::get_position(&pos);
+
+    (x, y)
+}
