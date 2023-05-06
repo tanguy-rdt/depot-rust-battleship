@@ -4,6 +4,7 @@ use cli_ui::update_ui;
 
 mod cli_ui;
 mod game;
+mod tools;
 struct Game{
     board: [[&'static str; 10]; 10],
 }

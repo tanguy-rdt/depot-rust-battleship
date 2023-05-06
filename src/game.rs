@@ -15,22 +15,6 @@ pub enum GameState {
     End,
 }
 
-
-
-pub fn check_ship_position((x, y): ([i32; 2], [i32; 2]), ship: &str) -> bool {
-    let x = x[1]-x[0]+1;
-    let y = y[1]-y[0]+1;
-    let res = match ship {
-        "Aircraft carrier" => if (x == 5) || (y == 5) { true } else { false },
-        "Cruiser" => if (x == 4) || (y == 4) { true } else { false },
-        "Destroyer" => if (x == 3) || (y == 3) { true } else { false },
-        "Submarine" => if (x == 2) || (y == 2) { true } else { false },
-        _ => false,
-    };
-
-    res
-}
-
 pub fn fill_user_solution((x, y): ([i32; 2], [i32; 2]), user: &mut User){
     if x[0] == x[1] {
         for i in y[0]..y[1]+1{
