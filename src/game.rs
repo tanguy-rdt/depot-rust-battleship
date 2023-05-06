@@ -1,24 +1,19 @@
 pub struct User {
+    pub name: String,
     pub solution: [[&'static str; 10]; 10],
-    pub state: [[&'static str; 10]; 10],
+    pub board: [[&'static str; 10]; 10],
+    pub player: bool,
+    pub winner: bool, 
 }
 
-pub fn get_position(pos: &str) -> (i32, i32){
-    let mut chars = pos.chars();
-    let letter = chars.next().unwrap();
-
-    let mut x = 0;
-    if letter.is_ascii_lowercase() {
-        x = (letter as i32) - ('a' as i32);
-    }
-    else if letter.is_ascii_uppercase() {
-        x = (letter as i32) - ('A' as i32);
-    }
-    
-    let y = chars.as_str().parse::<i32>().unwrap();
-
-    (x, y)
+#[derive(Eq, PartialEq)]
+pub enum GameState {
+    INIT, 
+    IN_GAME,
+    END,
 }
+
+
 
 pub fn check_ship_position((x, y): ([i32; 2], [i32; 2]), ship: &str) -> bool {
     let x = x[1]-x[0]+1;
@@ -47,27 +42,39 @@ pub fn fill_user_solution((x, y): ([i32; 2], [i32; 2]), user: &mut User){
     }
 }
 
-pub fn fill_user_state((x, y): (i32, i32), user: &mut User){
+pub fn fill_user_board((x, y): (i32, i32), user: &mut User){
     if user.solution[x as usize][y as usize] == "x" {
-        user.state[x as usize][y as usize] = "x";
+        user.board[x as usize][y as usize] = "x";
     }
     else {
-        user.state[x as usize][y as usize] = " ";
+        user.board[x as usize][y as usize] = " ";
     }
 }
 
-pub fn end(user1: &User, user2: &User) -> bool{
+pub fn get_game_state(user1: &User, user2: &User) -> GameState{
+    let mut nb_x_user1: u8 = 0;
+    let mut nb_x_user2: u8 = 0;
+
     for x in 0..9 {
         for y in 0..9 {
-            if (user1.solution[x][y] == "x") && (user1.state[x][y] != "x"){
-                return false
+            if ((user1.solution[x][y] == "x") && (user1.board[x][y] != "x")) || ((user2.solution[x][y] == "x") && (user2.board[x][y] != "x")){
+                return GameState::IN_GAME
             }
 
-            if (user2.solution[x][y] == "x") && (user2.state[x][y] != "x"){
-                return false
+            if user1.solution[x][y] == "x" {
+                nb_x_user1 += 1;
             }
+
+            if user2.solution[x][y] == "x" {
+                nb_x_user2 += 1;
+            }
+
         }
     }
 
-    true
+    if (nb_x_user1 < 19) || (nb_x_user2 < 19) {
+        return GameState::INIT;
+    }
+
+    GameState::END
 }
