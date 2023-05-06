@@ -7,7 +7,7 @@ pub fn update_ui(user1: &game::User, user2: &game::User, game_state: game::GameS
     show_battleship();
 
     match game_state {
-        game::GameState::INIT => {
+        game::GameState::Init => {
             if user1.player {
                 show_boards(user1.solution, user2.board, 1);
             }
@@ -15,7 +15,7 @@ pub fn update_ui(user1: &game::User, user2: &game::User, game_state: game::GameS
                 show_boards(user1.board, user2.solution, 2);
             }
         }
-        game::GameState::IN_GAME => {
+        game::GameState::InGame => {
             if user1.player {
                 show_boards(user1.board, user2.board, 1);
             }
@@ -23,7 +23,7 @@ pub fn update_ui(user1: &game::User, user2: &game::User, game_state: game::GameS
                 show_boards(user1.board, user2.board, 2);
             }
         }
-        game::GameState::END => {
+        game::GameState::End => {
             show_boards(user1.solution, user2.solution, 1);
             if user1.winner {
                 println!("The winner is User 1 !");
@@ -99,18 +99,46 @@ pub fn show_boards(user1_board: [[&str; 10]; 10], user2_board: [[&str; 10]; 10],
     println!("\n\n");
 }
 
-pub fn ask_ship_position(ship: &str) -> ([i32; 2], [i32; 2]){
-    print!("Enter the position of the {}: ", ship);
-    _ = io::stdout().flush();
-    let mut pos = String::new();
-    _ = io::stdin().read_line(&mut pos);
+pub fn ask_ship_position(ship: &str, nb_case: u8) -> ([i32; 2], [i32; 2]){
+    let mut valid_input: [bool; 2] = [false; 2];
 
-    let pos_split: Vec<&str> = pos.trim().split(":").collect();
+    loop {
+        print!("Enter the position of the {} (number of case {}): ", ship, nb_case);
+        _ = io::stdout().flush();
 
-    let (x1, y1) = get_position(pos_split[0]);
-    let (x2, y2) = get_position(pos_split[1]);
+        let mut input = String::new();
+        _ = io::stdin().read_line(&mut input);
+        input = input.trim().to_string();
 
-    ([x1, x2], [y1, y2])
+        if input.len() == 5 {    
+            let input_split: Vec<&str> = input.trim().split(":").collect();
+
+            for i in 0..2 {
+                let input_split_split: Vec<char> = input_split[i].trim().chars().collect();
+                let letter = input_split_split[0];
+                let number = input_split_split[1];
+
+                if ((letter >= 'A' && letter <= 'J') || (letter >= 'a' && letter <= 'j')) && (number >= '0' && number <= '9') {
+                    valid_input[i] = true;
+                }
+                else {
+                    valid_input = [false; 2];
+                    println!("Error --> The input is not valid (help: 'a0:a4' or 'A0:A4')");
+                }
+            }
+
+            if valid_input[0] && valid_input[1] {
+                let (x1, y1) = get_position(input_split[0]);
+                let (x2, y2) = get_position(input_split[1]);
+            
+                return ([x1, x2], [y1, y2]);
+            }
+        }
+        else {
+            valid_input = [false; 2];
+            println!("Error --> The input is not valid (help: 'a0:a4' or 'A0:A4')");
+        }
+    }
 }
 
 pub fn get_position(pos: &str) -> (i32, i32){
@@ -131,13 +159,35 @@ pub fn get_position(pos: &str) -> (i32, i32){
 }
 
 pub fn ask_target() -> (i32, i32){
-    print!("Enter the position of the target: ");
-    _ = io::stdout().flush();
-    let mut pos = String::new();
-    _ = io::stdin().read_line(&mut pos);
-    pos = pos.trim().to_string();
+    let mut input = String::new();
+    let mut valid_input = false;
 
-    let (x, y) = get_position(&pos);
+    while !valid_input {
+        print!("Enter the position of the target: ");
+        _ = io::stdout().flush();
+        _ = io::stdin().read_line(&mut input);
+        input = input.trim().to_string();
+
+        if input.len() == 2 {
+            let input_split: Vec<char> = input.trim().chars().collect();
+            let letter = input_split[0];
+            let number = input_split[1];
+
+            if ((letter >= 'A' && letter <= 'J') || (letter >= 'a' && letter <= 'j')) && (number >= '0' && number <= '9') {
+                valid_input = true;
+            }
+            else {
+                println!("Error --> The input is not valid (help: 'a0' or 'A0')");
+                input.clear();
+            }
+        }        
+        else {
+            println!("Error --> The input is not valid (help: 'a0' or 'A0')");
+            input.clear();
+        }
+    }
+
+    let (x, y) = get_position(&input);
 
     (x, y)
 }

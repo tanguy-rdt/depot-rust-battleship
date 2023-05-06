@@ -10,9 +10,9 @@ pub struct User {
 
 #[derive(Eq, PartialEq)]
 pub enum GameState {
-    INIT, 
-    IN_GAME,
-    END,
+    Init, 
+    InGame,
+    End,
 }
 
 
@@ -71,14 +71,14 @@ pub fn get_game_state(user1: &mut User, user2: &mut User) -> GameState{
 
     if user1_winner {
         user1.winner = true;
-        return GameState::END;
+        return GameState::End;
     }
     else if user2_winner {
         user2.winner = true;
-        return GameState::END;
+        return GameState::End;
     }
     else {
-        return GameState::IN_GAME;
+        return GameState::InGame;
     }
 
 }
