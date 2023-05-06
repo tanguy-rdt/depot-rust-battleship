@@ -89,7 +89,7 @@ fn main(){
         in_game(&mut user1, &mut user2);
         user1.player = !user1.player;
         user2.player = !user2.player;
-        game_state = game::get_game_state(&user1, &user2);
+        game_state = game::get_game_state(&mut user1, &mut user2);
     }
 
     update_ui(&user1, &user2, game::GameState::END);

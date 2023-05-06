@@ -1,3 +1,5 @@
+use crate::Game;
+
 pub struct User {
     pub name: String,
     pub solution: [[&'static str; 10]; 10],
@@ -51,30 +53,32 @@ pub fn fill_user_board((x, y): (i32, i32), user: &mut User){
     }
 }
 
-pub fn get_game_state(user1: &User, user2: &User) -> GameState{
-    let mut nb_x_user1: u8 = 0;
-    let mut nb_x_user2: u8 = 0;
+pub fn get_game_state(user1: &mut User, user2: &mut User) -> GameState{
+    let mut user1_winner = true;
+    let mut user2_winner = true;
 
     for x in 0..9 {
         for y in 0..9 {
-            if ((user1.solution[x][y] == "x") && (user1.board[x][y] != "x")) || ((user2.solution[x][y] == "x") && (user2.board[x][y] != "x")){
-                return GameState::IN_GAME
+            if ((user1.solution[x][y] == "x") && (user1.board[x][y] != "x")) {
+                user2_winner = false;
             }
-
-            if user1.solution[x][y] == "x" {
-                nb_x_user1 += 1;
+            
+            if ((user2.solution[x][y] == "x") && (user2.board[x][y] != "x")) {
+                user1_winner = false;
             }
-
-            if user2.solution[x][y] == "x" {
-                nb_x_user2 += 1;
-            }
-
         }
     }
 
-    if (nb_x_user1 < 19) || (nb_x_user2 < 19) {
-        return GameState::INIT;
+    if user1_winner {
+        user1.winner = true;
+        return GameState::END;
+    }
+    else if user2_winner {
+        user2.winner = true;
+        return GameState::END;
+    }
+    else {
+        return GameState::IN_GAME;
     }
 
-    GameState::END
 }

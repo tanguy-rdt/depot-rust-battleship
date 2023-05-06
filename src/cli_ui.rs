@@ -24,7 +24,13 @@ pub fn update_ui(user1: &game::User, user2: &game::User, game_state: game::GameS
             }
         }
         game::GameState::END => {
-
+            show_boards(user1.solution, user2.solution, 1);
+            if user1.winner {
+                println!("The winner is User 1 !");
+            }
+            else {
+                println!("The winner is User 2 !");
+            }
         }
     }
 }
