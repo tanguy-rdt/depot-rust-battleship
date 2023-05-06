@@ -15,7 +15,7 @@ pub fn get_position(pos: &str) -> (i32, i32){
     (x, y)
 }
 
-fn check_ship_position((x, y): ([i32; 2], [i32; 2]), ship: &str) -> bool {
+pub fn check_ship_position((x, y): ([i32; 2], [i32; 2]), ship: &str) -> bool {
     let x = x[1]-x[0]+1;
     let y = y[1]-y[0]+1;
     let res = match ship {

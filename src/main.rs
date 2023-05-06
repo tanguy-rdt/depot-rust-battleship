@@ -35,7 +35,7 @@ fn init() -> (game::User, game::User){
         cli_ui::update_ui(&user1, &user2, game::GameState::Init);
         loop {
             let (x, y) = cli_ui::ask_ship_position(ships[ship], nb_case[ship]);
-            if game::check_ship_position((x, y), ships[ship]) {
+            if tools::check_ship_position((x, y), ships[ship]) {
                 game::fill_user_solution((x, y), &mut user1);
                 break;
             }
@@ -51,7 +51,7 @@ fn init() -> (game::User, game::User){
         cli_ui::update_ui(&user1, &user2, game::GameState::Init);
         loop {
             let (x, y) = cli_ui::ask_ship_position(ships[ship], nb_case[ship]);
-            if game::check_ship_position((x, y), ships[ship]) {
+            if tools::check_ship_position((x, y), ships[ship]) {
                 game::fill_user_solution((x, y), &mut user2);
                 break;
             }
