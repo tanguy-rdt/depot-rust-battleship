@@ -1,43 +1,25 @@
 use std::io::{self, Write};
 
-use crate::game;
-use crate::tools;
+use crate::game::{self, User, UserStatus};
 
-pub fn update_ui(user1: &game::User, user2: &game::User, game_state: game::GameState){
+pub fn update_ui(user1: &User, user2: &User) {
     clear_screen();
     show_battleship();
+    show_username();
+    show_boards(user1.get_board(), user2.get_board());
+}
 
-    match game_state {
-        game::GameState::Init => {
-            if user1.player {
-                show_boards(user1.solution, user2.board, 1);
-            }
-            else {
-                show_boards(user1.board, user2.solution, 2);
-            }
-        }
-        game::GameState::InGame => {
-            if user1.player {
-                show_boards(user1.board, user2.board, 1);
-            }
-            else {
-                show_boards(user1.board, user2.board, 2);
-            }
-        }
-        game::GameState::End => {
-            show_boards(user1.solution, user2.solution, 1);
-            if user1.winner {
-                println!("The winner is User 1 !");
-            }
-            else {
-                println!("The winner is User 2 !");
-            }
-        }
+pub fn show_winner(user1: &User, user2: &User) {
+    if *user1.get_status() == UserStatus::Winner {
+        println!("The winner is User 1")
+    }
+    else if *user2.get_status() == UserStatus::Winner {
+        println!("The winner is User 2")
     }
 }
 
 
-pub fn show_battleship(){
+fn show_battleship(){
     println!("
     ███████████             █████     █████    ████            █████████  █████       ███           
     ░░███░░░░░███           ░░███     ░░███    ░░███           ███░░░░░███░░███       ░░░            
@@ -53,18 +35,15 @@ pub fn show_battleship(){
     ");
 }
 
-pub fn clear_screen() {
+fn clear_screen() {
     _ = io::stdout().write_all(b"\x1B[2J\x1B[1;1H");
 }
 
-pub fn show_boards(user1_board: [[&str; 10]; 10], user2_board: [[&str; 10]; 10], player: u8){
-    if player == 1{
-        println!("\t\t           Your board                        Opponent's board");
-    }
-    else{
-        println!("\t\t        Opponent's board                        Your board");
-    }
-    
+fn show_username() {
+    println!("\t\t              User 1                             User 2");
+}
+
+fn show_boards(user1_board: [[&str; 10]; 10], user2_board: [[&str; 10]; 10]){
     println!("\t\t   0  1  2  3  4  5  6  7  8  9        0  1  2  3  4  5  6  7  8  9");
 
     for x in 0..10 {
@@ -83,6 +62,21 @@ pub fn show_boards(user1_board: [[&str; 10]; 10], user2_board: [[&str; 10]; 10],
         println!("");
     }
     println!("\n\n");
+}
+
+pub fn ask_name() -> (String, String) {
+    let mut username: Vec<String> = vec![Default::default(), Default::default()];
+
+    for user in 0..2{
+        print!("User {}, enter your name: ", user+1);
+        _ = io::stdout().flush();
+
+        let mut input = String::new();
+        _ = io::stdin().read_line(&mut input);
+        username[user] = input.trim().to_string();
+    }
+
+    (username.swap_remove(0), username.swap_remove(0))
 }
 
 pub fn ask_ship_position(ship: &str, nb_case: u8) -> ([i32; 2], [i32; 2]){
@@ -114,8 +108,8 @@ pub fn ask_ship_position(ship: &str, nb_case: u8) -> ([i32; 2], [i32; 2]){
             }
 
             if valid_input[0] && valid_input[1] {
-                let (x1, y1) = tools::get_position(input_split[0]);
-                let (x2, y2) = tools::get_position(input_split[1]);
+                let (x1, y1) = game::get_position(input_split[0]);
+                let (x2, y2) = game::get_position(input_split[1]);
             
                 return ([x1, x2], [y1, y2]);
             }
@@ -156,7 +150,7 @@ pub fn ask_target() -> (i32, i32){
         }
     }
 
-    let (x, y) = tools::get_position(&input);
+    let (x, y) = game::get_position(&input);
 
     (x, y)
 }
