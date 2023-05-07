@@ -153,5 +153,4 @@ pub fn ask_target() -> (i32, i32){
     let (x, y) = game::get_position(&input);
 
     (x, y)
-}
-
+}        
