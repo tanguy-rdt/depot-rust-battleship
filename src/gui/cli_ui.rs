@@ -15,6 +15,7 @@ impl Ui for CliUi {
         show_battleship();
         show_username();
         show_boards(user1.get_board(), user2.get_board());
+        show_ship_status(user1, user2);
     }
 
     fn ask_ship_position(&self, ship: &str, nb_case: u8) -> ([i32; 2], [i32; 2]){
@@ -103,13 +104,19 @@ impl Ui for CliUi {
     }
 }
 
-fn show_winner(user1: &User, user2: &User) {
-    if *user1.get_status() == UserStatus::Winner {
-        println!("The winner is User 1")
+fn show_ship_status(user1: &User, user2: &User) {
+    println!("{:<15}{}", " ", "-".repeat(70));
+    println!("{:>55}", "Ship status");
+    println!("{:<15}{}", " ", "-".repeat(70));
+    println!("\n");
+
+    for ship in game::SHIPS {
+        let symbol_user1 = if *user1.get_ship_status(ship) { "✔" } else { "✖" };
+        let symbol_user2 = if *user2.get_ship_status(ship) { "✔" } else { "✖" };
+        println!("{:<15}-> {:<18} {} {:<15}-> {:<18} {}", " ", ship, symbol_user1, " ", ship, symbol_user2);
     }
-    else if *user2.get_status() == UserStatus::Winner {
-        println!("The winner is User 2")
-    }
+
+    println!("\n\n");
 }
 
 
@@ -155,5 +162,5 @@ fn show_boards(user1_board: [[&str; 10]; 10], user2_board: [[&str; 10]; 10]){
 
         println!("");
     }
-    println!("\n\n");
+    println!("\n");
 }

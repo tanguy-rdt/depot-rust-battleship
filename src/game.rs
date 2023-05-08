@@ -1,4 +1,6 @@
-pub const SHIPS: [&str; 6] = ["Aircraft carrier", "Cruiser", "Destroyer", "Destroyer", "Submarine", "Submarine"];
+use std::collections::HashMap;
+
+pub const SHIPS: [&str; 6] = ["Aircraft carrier", "Cruiser", "Destroyer 1", "Destroyer 2", "Submarine 1", "Submarine 2"];
 pub const SHIP_SIZES: [u8; 6] = [5, 4, 3, 3, 2, 2];
 
 #[derive(Eq, PartialEq)]
@@ -13,15 +15,26 @@ pub enum UserStatus {
 pub struct User {
     solution: [[&'static str; 10]; 10],
     board: [[&'static str; 10]; 10],
-    status: UserStatus
+    status: UserStatus,
+    ships_status: HashMap<&'static str, bool>, 
+    ships_position: HashMap<&'static str, Vec<(u8, u8)>>
 }
 
 impl User {
     pub fn new() -> Self {
+        let mut ships_status_hashmap = HashMap::new();
+        let mut ships_position_hashmap = HashMap::new();
+        for (ship, ship_nb) in SHIPS.iter().zip(SHIP_SIZES.iter()) {
+            ships_status_hashmap.insert(*ship, false);
+            ships_position_hashmap.insert(*ship, vec![(0, 0); SHIP_SIZES[*ship_nb as usize].into()]);
+        }
+
         User {
             solution: [[" "; 10]; 10],
             board: [["-"; 10]; 10],
-            status: UserStatus::None
+            status: UserStatus::None, 
+            ships_status: ships_status_hashmap, 
+            ships_position: ships_position_hashmap
         }
     }
 
@@ -48,6 +61,27 @@ impl User {
         }
     }
 
+    pub fn set_ship_position(&mut self, (x, y): ([i32; 2], [i32; 2]), ship: &'static str) {
+        let mut position: Vec<(u8, u8)> = vec![(0, 0); SHIP_SIZES[SHIPS.iter().position(|&s| s == ship).unwrap()].into()];
+
+        if x[0] == x[1] {
+            let x = x[0];
+            for y in y[0]..y[1]+1{
+                self.solution[x as usize][y as usize] = "x";
+                position[y as usize] = (x as u8, y as u8);
+            }
+        }
+        else {
+            let y = y[0];
+            for x in x[0]..x[1]+1{
+                self.solution[x as usize][y as usize] = "x";
+                position[x as usize] = (x as u8, y as u8);
+            }
+        }
+
+        self.ships_position.insert(ship, position);
+    }
+
     pub fn set_board(&mut self, (x, y): (i32, i32)) {
         if self.solution[x as usize][y as usize] == "x" {
             self.board[x as usize][y as usize] = "x";
@@ -63,6 +97,14 @@ impl User {
 
     pub fn set_status(&mut self, state: UserStatus) {
         self.status = state;
+    }
+
+    pub fn get_ship_status(&self, ship: &str) -> &bool {
+        self.ships_status.get(ship).unwrap()
+    }
+
+    pub fn set_ship_status(&mut self, ship: &'static str, status: bool) {
+        self.ships_status.insert(ship, status);
     }
 }
 
@@ -112,8 +154,8 @@ pub fn check_ship_position((x, y): ([i32; 2], [i32; 2]), ship: &str) -> bool {
     let res = match ship {
         "Aircraft carrier" => if (x == 5) || (y == 5) { true } else { false },
         "Cruiser" => if (x == 4) || (y == 4) { true } else { false },
-        "Destroyer" => if (x == 3) || (y == 3) { true } else { false },
-        "Submarine" => if (x == 2) || (y == 2) { true } else { false },
+        "Destroyer 1" | "Destroyer 2" => if (x == 3) || (y == 3) { true } else { false },
+        "Submarine 1" | "Submarine 2" => if (x == 2) || (y == 2) { true } else { false },
         _ => false,
     };
 

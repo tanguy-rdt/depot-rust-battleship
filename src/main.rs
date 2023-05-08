@@ -28,9 +28,11 @@ fn set_ship_position<T: Ui>(ui: &T, user1: &mut User, user2: &mut User) {
             if game::check_ship_position((x, y), ship) {
                 if *user1.get_status() == UserStatus::Init {
                     user1.set_solution((x, y));
+                    user1.set_ship_status(ship, true);
                 }
                 else {
                     user2.set_solution((x, y));
+                    user2.set_ship_status(ship, true);
                 }
                 
                 break;
@@ -57,10 +59,10 @@ fn playing_turn<T: Ui>(ui: &T, user1: &mut User, user2: &mut User) {
     let (x, y) = ui.ask_target();
 
     if *user1.get_status() == UserStatus::Player {
-        user1.set_board((x, y));
+        user2.set_board((x, y));
     }
     else {
-        user2.set_board((x, y));
+        user1.set_board((x, y));
     }
 }
 
